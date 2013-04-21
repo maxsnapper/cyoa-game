@@ -1,6 +1,7 @@
 # Filename: game.py
 #imports
 from rooms import Rooms
+from map import Map
 from player import Player
 
 class Game(object):
@@ -9,14 +10,18 @@ class Game(object):
 		''' Setup the game object'''
 		self.player = Player(game=self) 
 		self.room = Rooms(game=self)
+		self.map = Map(game=self)
 		self.last_question = ''
-		#if(self.player.username == ''):
-		#	self.player.createPlayer()
-			
+		
+	def start_game(self):
+		self.room.create()
+#		if(self.player.username == ''):
+#			self.player.createPlayer()
 
+		#self.game.play()
+	
 	def play(self):
 		''' Starting the game '''
-
 		try:
 			print "Let's play!"
 			question = 'Which way would you like to go? Left or Right?'
@@ -31,6 +36,14 @@ class Game(object):
 			print "move onto the %s room" % next_room
 			self.room.move_to_room(next_room)
 		
+		except IOError:
+			print "IOError"
+			exit(0)
+	#	except PlayerEscape:
+	#		self.escape()
+	#	except PlayerDead:
+	#		self.play.dead(reason=None, retry=True) 
+		# So player can CTRL-C out of the game!
 		except KeyboardInterrupt:
 			self.player.dead("Quitter, you will never know how it finishes!", False)
 
@@ -47,11 +60,11 @@ class Game(object):
 		counter = 1
 		### loop through the options and display them
 		for option in options:	
-			print "\t[%s] %s" % (counter, option)
+			print "  [%s] %s" % (self.bold(counter), option)
 			counter = counter + 1
 		### display the other options such as quit and help.
-		print "\n\t[h] Help"
-		print "\t[q] Quit"
+		print "\n  [h] Help"
+		print "  [q] Quit"
 #		print "\t[hp] Check health"
 #		print "\t[gc] Check gold"
 		input_data = raw_input(prompt)
@@ -77,7 +90,7 @@ class Game(object):
 		if(type(value) == int and value <= count):
 			return value
 		else:
-			raise ValueError("%s is not a valid number")
+			raise ValueError("%s is not a valid number" % value)
 
 	def escape(self):
 		''' Player has managed to find their way out '''
@@ -93,11 +106,16 @@ class Game(object):
 		print "\t help \t\t show this help"
 		print "\t quit \t\t Exit out of the game regardless where you are"
 		print "\t rename \t Rename your existing character\n"
-		print "\t check \t\t get info for some things"
-		print "\t\t health \t get amount of health"
-		print "\t\t gold \t\t get amount of gold"
+#		print "\t check \t\t get info for some things"
+#		print "\t\t health \t get amount of health"
+#		print "\t\t gold \t\t get amount of gold"
 		print "\n"
 		
+	def option(self, msg):
+		return u'\033[1m%s\033[0m' % msg
+	def bold(self, msg):
+		return u'\033[1m%s\033[0m' % msg
 
 game = Game()
-game.play()
+#game.play()
+game.start_game()

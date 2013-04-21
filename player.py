@@ -4,11 +4,10 @@ class Player(object):
 	
 	def __init__(self, game):
 		''' initialize the player '''
-		print "setup the player"
 		self.game = game
 		self.username = ''
 		self.health = 100
-		self.gold = 0
+		self.treasure = {'gold':0, 'rubies':0, 'diamonds':0}
 
 	def createPlayer(self):
 		self.default_username = 'Player'
