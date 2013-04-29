@@ -9,7 +9,7 @@ from maps import *
 class QuitGame(Exception):
     pass
 
-class Game():
+class Main():
     def __init__(self):
 	pygame.init()
 	self.player = Player(game=self)
@@ -57,5 +57,5 @@ class Game():
 	pygame.quit()
 	sys.exit()
 
-
-game = Game()
+if __name__ == "__main__":
+    Main()
