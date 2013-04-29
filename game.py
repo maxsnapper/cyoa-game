@@ -1,121 +1,61 @@
 # Filename: game.py
-#imports
-from rooms import Rooms
-from map import Map
+import pygame
+import sys
+from random import randint
+from pygame.locals import *
 from player import Player
+from maps import *
 
-class Game(object):
-	''' Main game controller '''
-	def __init__(self):
-		''' Setup the game object'''
-		self.player = Player(game=self) 
-		self.room = Rooms(game=self)
-		self.map = Map(game=self)
-		self.last_question = ''
-		
-	def start_game(self):
-		self.room.create()
-#		if(self.player.username == ''):
-#			self.player.createPlayer()
+class QuitGame(Exception):
+    pass
 
-		#self.game.play()
-	
-	def play(self):
-		''' Starting the game '''
-		try:
-			print "Let's play!"
-			question = 'Which way would you like to go? Left or Right?'
-			choice = self.ask_question( options=['Left', 'Right'], question=question)
-			if(choice == 1):
-				next_room = "left"
-			elif(choice == 2):
-				next_room = "right"
-			else:
-				self.player.dead("Well that was daft, you died")
-		
-			print "move onto the %s room" % next_room
-			self.room.move_to_room(next_room)
-		
-		except IOError:
-			print "IOError"
-			exit(0)
-	#	except PlayerEscape:
-	#		self.escape()
-	#	except PlayerDead:
-	#		self.play.dead(reason=None, retry=True) 
-		# So player can CTRL-C out of the game!
-		except KeyboardInterrupt:
-			self.player.dead("Quitter, you will never know how it finishes!", False)
-
-
-	def ask_question(self, options = {'y': True, 'n': False, 'quit': 'quit'}, prompt='> ', question='', fail_count=0):
-		''' Custom input retrieval to help clean up inputs
-			Allows for a quit '''
-		### kill the player off because they don't type an appropriate choice
-		if(fail_count > 5):
-			self.player.dead("You died as you made too many mistakes!")
-		option_count = len(options)
-		self.last_question = question
-		print "%s\n" % question
-		counter = 1
-		### loop through the options and display them
-		for option in options:	
-			print "  [%s] %s" % (self.bold(counter), option)
-			counter = counter + 1
-		### display the other options such as quit and help.
-		print "\n  [h] Help"
-		print "  [q] Quit"
-#		print "\t[hp] Check health"
-#		print "\t[gc] Check gold"
-		input_data = raw_input(prompt)
-		
-		### Options to run other actions
-		if(input_data == 'quit' or input_data == 'q'):
-			self.player.dead("Quitter, you will never know how it finishes!", False)
-		elif(input_data == 'help' or input_data == 'h'):
-			self.help_files()
-			self.ask_question(options=options, prompt=prompt, question=self.last_question)
+class Game():
+    def __init__(self):
+	pygame.init()
+	self.player = Player(game=self)
+	self.maps = Maps(game=self)
+	self.screen = pygame.display.set_mode((self.maps.width, self.maps.height))
+	pygame.display.set_caption('Choose your own Adventure game!')
+        self.play()
+        #exit(0)
+        
+    def play(self):
+	playing = True
+	while playing:
+	    try:
+		for event in pygame.event.get():
+		    #if self.player.rect.colliderect(self.maps.end_rect):
+		#	raise SystemExit("You win!")
+		    if event.type == QUIT or (event.type == KEYDOWN and event.key == pygame.K_q):
+		       raise QuitGame()
+		    elif event.type == KEYDOWN:
+			#print pygame.key.get_pressed()
+			if pygame.key.get_pressed()[K_LEFT]:
+			    self.player.move(-1, 0)
+			if pygame.key.get_pressed()[K_RIGHT]:
+			    self.player.move(1, 0)
+			if pygame.key.get_pressed()[K_UP]:
+			    self.player.move(0, -1)
+			if pygame.key.get_pressed()[K_DOWN]:
+			    self.player.move(0, 1)
 		else:
-			try: 
-				input_data = self.check_input(input_data, option_count)
-				return input_data
-			except ValueError:
-				print "Not a valid input, please try again"
-				self.ask_question(options=options, prompt=prompt, question=self.last_question, fail_count=fail_count+1)
-		
+		    pass
+		self.screen.fill((0,0,0))
+		#for wall in self.maps.walls:
+		#    pygame.draw.rect(self.screen, (255,255,255), wall.rect)
+		#pygame.draw.rect(self.screen, (255, 0, 0), self.maps.end_rect)
+		for room in self.maps.rooms:
+		     pygame.draw.rect(self.screen, (255,255,255), room.rect,2)
+                pygame.draw.rect(self.screen, (255,200,0), self.player.rect)
+		pygame.display.flip()
+	    except (QuitGame, KeyboardInterrupt, SystemExit):
+		playing = False
+		print "\nQuitter! you will never see how this finishes!"
+	    finally:
+		pass
 
-	def check_input(self, value, count):
-		value = int(value)
-		count = int(count)
-		if(type(value) == int and value <= count):
-			return value
-		else:
-			raise ValueError("%s is not a valid number" % value)
+	pygame.quit()
+	sys.exit()
 
-	def escape(self):
-		''' Player has managed to find their way out '''
-		print "Congratulations %s, you managed to escape" % self.player.username
-		print "You Win!!!"
-		self.player.try_again()
-
-	def help_files(self):
-		print "-" * 20
-		print "Help Files"
-		print "-" * 20
-		print "When asked any question you can run any of the following commands"
-		print "\t help \t\t show this help"
-		print "\t quit \t\t Exit out of the game regardless where you are"
-		print "\t rename \t Rename your existing character\n"
-#		print "\t check \t\t get info for some things"
-#		print "\t\t health \t get amount of health"
-#		print "\t\t gold \t\t get amount of gold"
-		print "\n"
-		
-	def option(self, msg):
-		return u'\033[1m%s\033[0m' % msg
-	def bold(self, msg):
-		return u'\033[1m%s\033[0m' % msg
 
 game = Game()
-#game.play()
-game.start_game()
