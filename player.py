@@ -4,8 +4,9 @@ from pygame.locals import *
 class Player(object):
 
     def __init__(self, game):
-	self.game = game
+        self.game = game
         self.rect = pygame.Rect(30, 30, 10, 10)
+        self.in_room = None
 
     def move(self, dx, dy):
         if dx != 0:
@@ -14,18 +15,26 @@ class Player(object):
             self.move_single_axis(0, dy*10)
  
     def move_single_axis(self, dx, dy):
-        # Move the rect
-        self.rect.x += dx
-        self.rect.y += dy
         # If you collide with a wall, move out based on velocity
-        for wall in self.game.maps.walls:
-            if self.rect.colliderect(wall.rect):
-                if dx > 0: # Moving right; Hit the left side of the wall
-                    self.rect.right = wall.rect.left
-                if dx < 0: # Moving left; Hit the right side of the wall
-                    self.rect.left = wall.rect.right
-                if dy > 0: # Moving down; Hit the top side of the wall
-                    self.rect.bottom = wall.rect.top
-                if dy < 0: # Moving up; Hit the bottom side of the wall
-                    self.rect.top = wall.rect.bottom
+        if dx + self.rect.x <= 0: 
+            self.rect.x = 0
+        elif dx + self.rect.x >= self.game.maps.width:
+            self.rect.x = self.game.maps.width-10
+        else: 
+            self.rect.x += dx
 
+        if dy + self.rect.y <= 0: 
+            self.rect.y = 0
+        elif dy + self.rect.y >= self.game.maps.height:
+            self.rect.y = self.game.maps.height-10
+        else:
+            self.rect.y += dy
+        for room in self.game.maps.rooms:
+            if room.rect.contains(self.rect):
+                if room.room_id <> self.in_room:
+                    print "ROOM id: %s, %s" % (room.room_id, room.rect)
+                self.in_room = room.room_id
+        for door in self.game.maps.doors:
+            if door.rect.contains(self.rect):
+                print "DOOR: id: %s, %s, %s" % (door.door_id, door.rect, list(door.room_ids))
+        
