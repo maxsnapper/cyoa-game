@@ -3,7 +3,7 @@ import pygame
 import sys
 from player import Player
 from maps import Maps
-from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_DOWN, K_a, K_s, K_d, K_w, K_l, K_r, QUIT, KEYDOWN
+from pygame.locals import QUIT, KEYDOWN
 class QuitGame(Exception):
     pass
 
@@ -20,43 +20,14 @@ class Main():
         while playing:
             try:
                 for event in pygame.event.get():
-                    #if self.player.rect.colliderect(self.maps.end_rect):
-                    #raise SystemExit("You win!")
                     if (event.type == QUIT or
                         (event.type == KEYDOWN and event.key == pygame.K_q)):
                         raise QuitGame()
                     elif event.type == KEYDOWN:
-                        #print pygame.key.get_pressed()
-                        if pygame.key.get_pressed()[K_LEFT]:
-                            self.player.move(-1, 0)
-                        elif pygame.key.get_pressed()[K_a]:
-                            self.player.move(-0.5, 0)
-                        elif pygame.key.get_pressed()[K_RIGHT]:
-                            self.player.move(1, 0)
-                        elif pygame.key.get_pressed()[K_d]:
-                            self.player.move(0.5, 0)
-                        elif pygame.key.get_pressed()[K_UP]:
-                            self.player.move(0, -1)
-                        elif pygame.key.get_pressed()[K_w]:
-                            self.player.move(0, -0.5)
-                        elif pygame.key.get_pressed()[K_DOWN]:
-                            self.player.move(0, 1)
-                        elif pygame.key.get_pressed()[K_s]:
-                            self.player.move(0, 0.5)
-                        elif pygame.key.get_pressed()[K_l]:
-                            print "List Doors"
-                            for door in self.maps.doors :
-                                print "door: %i: %s -- %s" % (door.door_id, list(door.room_ids), list(door.rect))
-                        elif pygame.key.get_pressed()[K_r]:
-                            print "\n\n\n\n"
-                            self.player = Player(game=self)
-                            self.maps = Maps(game=self)
+                        self.key_action(event.key)
                     else:
                         pass
                 self.screen.fill((0, 0, 0))
-                #for wall in self.maps.walls:
-                #    pygame.draw.rect(self.screen, (255,255,255), wall.rect)
-                #pygame.draw.rect(self.screen, (255, 0, 0), self.maps.end_rect)
                 for room in self.maps.rooms:
                     pygame.draw.rect(self.screen, (255, 255, 255), room.rect, 1)
                 for door in self.maps.doors:
@@ -65,12 +36,46 @@ class Main():
                 pygame.display.flip()
             except (QuitGame, KeyboardInterrupt, SystemExit):
                 playing = False
-                print "\nQuitter! you will never see how this finishes!"
+                print "\nQuitter! You will never see how this finishes!"
             finally:
                 pass
 
         pygame.quit()
         sys.exit()
+
+    def key_action(self, key):
+        if key == pygame.K_LEFT:
+            self.player.move(-1, 0)
+        elif key == pygame.K_a:
+            self.player.move(-0.5, 0)
+        elif key == pygame.K_RIGHT:
+            self.player.move(1, 0)
+        elif key == pygame.K_d:
+            self.player.move(0.5, 0)
+        elif key == pygame.K_UP:
+            self.player.move(0, -1)
+        elif key == pygame.K_w:
+            self.player.move(0, -0.5)
+        elif key == pygame.K_DOWN:
+            self.player.move(0, 1)
+        elif key == pygame.K_s:
+            self.player.move(0, 0.5)
+        elif key == pygame.K_l:
+            print "List Doors"
+            for door in self.maps.doors :
+                print "door: %i: %s -- %s" % (door.door_id, list(door.room_ids), list(door.rect))
+        elif key == pygame.K_r:
+            print "\n\n\n\n"
+            self.player = Player(game=self)
+            self.maps = Maps(game=self)
+        elif key == pygame.K_h:
+            self.help_screen()
+
+    def help_screen(self):
+        print ""
+        print "-" * 20
+        print "Show the help screen"
+
 
 if __name__ == "__main__":
     Main()
