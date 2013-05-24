@@ -3,15 +3,15 @@ import pygame
 import sys
 from player import Player
 from maps import Maps
-from pygame.locals import QUIT, KEYDOWN
+
 class QuitGame(Exception):
     pass
 
 class Main():
     def __init__(self):
         pygame.init()
-        self.player = Player(game=self)
         self.maps = Maps(game=self)
+        self.player = Player(game=self)
         self.screen = pygame.display.set_mode((self.maps.width, self.maps.height))
         self.play()
 
@@ -20,28 +20,33 @@ class Main():
         while playing:
             try:
                 for event in pygame.event.get():
-                    if (event.type == QUIT or
-                        (event.type == KEYDOWN and event.key == pygame.K_q)):
+                    if (event.type == pygame.QUIT or
+                        (event.type == pygame.KEYDOWN and event.key == pygame.K_q)):
                         raise QuitGame()
-                    elif event.type == KEYDOWN:
+                    elif event.type == pygame.KEYDOWN:
                         self.key_action(event.key)
                     else:
                         pass
-                self.screen.fill((0, 0, 0))
-                for room in self.maps.rooms:
-                    pygame.draw.rect(self.screen, (255, 255, 255), room.rect, 1)
-                for door in self.maps.doors:
-                    pygame.draw.rect(self.screen, door.color, door.rect)
-                pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
-                pygame.display.flip()
+                    self.draw_map()
             except (QuitGame, KeyboardInterrupt, SystemExit):
                 playing = False
                 print "\nQuitter! You will never see how this finishes!"
             finally:
                 pass
-
         pygame.quit()
         sys.exit()
+
+    def draw_map(self):
+        self.screen.fill((0, 0, 0))
+        for room in self.maps.rooms:
+            if room == self.player.in_room():
+                pygame.draw.rect(self.screen, room.color, room.rect, 0)
+            else:
+                pygame.draw.rect(self.screen, room.color, room.rect, 1)
+        for door in self.maps.doors:
+            pygame.draw.rect(self.screen, door.color, door.rect)
+        pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
+        pygame.display.flip()
 
     def key_action(self, key):
         if key == pygame.K_LEFT:

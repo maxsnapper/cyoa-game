@@ -1,12 +1,11 @@
 import pygame
-#from pygame.locals import *
 
 class Player(object):
 
     def __init__(self, game):
         self.game = game
         self.rect = pygame.Rect(30, 30, 10, 10)
-        self.in_room = None
+        self.room = self.in_room()
 
     def move(self, dx, dy):
         if dx != 0:
@@ -15,7 +14,19 @@ class Player(object):
             self.move_single_axis(0, dy*10)
  
     def move_single_axis(self, dx, dy):
-        # If you collide with a wall, move out based on velocity
+        allow_move = False
+        is_door = False
+        room  = self.in_room()
+        for door in room.doors:
+            if door.rect.contains(self.rect):
+                is_door = True
+                break
+            else:
+                pass
+        self.move_character(dx, dy, is_door)
+
+    def move_character(self, dx, dy, is_door):
+        old_location = {'x': self.rect.x, 'y': self.rect.y}
         if dx + self.rect.x <= 0: 
             self.rect.x = 0
         elif dx + self.rect.x >= self.game.maps.width:
@@ -29,12 +40,16 @@ class Player(object):
             self.rect.y = self.game.maps.height-10
         else:
             self.rect.y += dy
-        for room in self.game.maps.rooms:
-            if room.rect.contains(self.rect):
-                if room.room_id != self.in_room:
-                    print "ROOM id: %s, %s" % (room.room_id, room.rect)
-                self.in_room = room.room_id
-        for door in self.game.maps.doors:
-            if door.rect.contains(self.rect):
-                print "DOOR: id: %s, %s, %s" % (door.door_id, door.rect, list(door.room_ids))
         
+        if self.in_room() != self.room and not is_door:
+            self.rect.x = old_location['x']
+            self.rect.y = old_location['y']
+        self.room = self.in_room()
+
+    def in_room(self):
+        for room in self.game.maps.rooms:
+            room.color = (255, 255, 255)
+            if room.rect.contains(self.rect):
+                room.color = (90, 90, 90)
+                rtn_room = room        
+        return rtn_room

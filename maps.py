@@ -8,14 +8,12 @@ class Maps(object):
         self.width = 400
         self.height = 300
         self.walls = []
-        self.level = []
         self.rooms = []
         self.doors = []
         self.room_count = randint(20, 25)
         self.min_room_area = 2500
         self.min_room_size = 50
         self.multiplier = 10
-        self.game.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('Choose your own Adventure game!')
         self.generate(game)
     
@@ -81,7 +79,6 @@ class Maps(object):
             return True
 
     def generate_doors(self):
-        #room1 = self.rooms[4];
         for room1 in self.rooms:
             for room2 in self.rooms:
                 x = None
@@ -120,14 +117,55 @@ class Maps(object):
                         new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), (255, 0, 0))
                         if not (new_door.is_duplicate(self.doors)):
                             self.doors.append(new_door)
+                            room1.doors.append(new_door)
+                            room2.doors.append(new_door)
                         else:
                             new_door = None
-        print "room: %s, <x=%s; x2=%s; y=%s; y2=%s> <w=%s; h:%s>" % (room1.room_id, room1.x, room1.x2, room1.y, room1.y2, room1.width, room1.height)
-        print "doors: %s to rooms: %s" % (len(self.doors), len(self.rooms))
-        print "number of doors created: %s" % len(self.doors)
+        for room1 in self.rooms:
+            for room2 in self.rooms:
+                x = None
+                y = None
+                if ((room1.x2 == room2.x) or 
+                    (room1.x == room2.x2)):
+                    if room1.x2 == room2.x:
+                        x = room1.x2
+                    else:
+                        x = room1.x
+                    if (room1.y <= room2.y and 
+                        room1.y2 >= room2.y2): 
+                        # bigger than original box
+                        if (room2.y2 - room2.y) >= 50 :
+                            y = (room2.y + room2.y2)/2
+                    elif (room1.y >= room2.y and 
+                        room1.y2 <= room2.y2): 
+                        # smaller than original box
+                        if (room1.y2 - room1.y) >= 50:
+                            y = (room1.y + room1.y2)/2
+                    elif (room1.y >= room2.y and 
+                        room1.y < room2.y2 and 
+                        room1.y2 >= room2.y2):
+                        # overlaps and to the left of original room
+                        if room2.y2 - room1.y >= 50:
+                            y = (room1.y + room2.y2)/2
+                    elif (room1.y <= room2.y and 
+                        room1.y2 > room2.y and 
+                        room1.y2 <= room2.y2): 
+                        # overlaps and to the right of the original room
+                        if (room1.y2 - room2.y) >= 50:
+                            y = (room2.y + room1.y2)/2
+                    if y :
+                        room1.attached.append(room2)
+                        room2.attached.append(room1)
+                        new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), (0, 255, 0))
+                        if not (new_door.is_duplicate(self.doors)):
+                            self.doors.append(new_door)
+                            room1.doors.append(new_door)
+                            room2.doors.append(new_door)
+                        else:
+                            new_door = None
 
 class Rooms(object):
-    def __init__(self, game, x, y, width, height, room_id=0):
+    def __init__(self, game, x, y, width, height, room_id=0, color=(255, 255, 255) ):
         self.game = game
         self.x = x
         self.y = y
@@ -138,6 +176,8 @@ class Rooms(object):
         self.y2 = y + height
         self.room_id = room_id
         self.attached = []
+        self.doors = []
+        self.color = color
 
     def resize(self, width, height):
         self.width = width
@@ -169,8 +209,6 @@ class Doors(object):
         is_duplicate = False
         for door in doors:
             if sorted(self.room_ids) == sorted(door.room_ids):
-                print "door %s matches %s (%s)<%s>" % (self.door_id, door.door_id, self.room_ids, door.room_ids)
-        #print self
                 is_duplicate = True
         return is_duplicate
 
