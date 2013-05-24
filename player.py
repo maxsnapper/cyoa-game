@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import *
+#from pygame.locals import *
 
 class Player(object):
 
@@ -31,7 +31,7 @@ class Player(object):
             self.rect.y += dy
         for room in self.game.maps.rooms:
             if room.rect.contains(self.rect):
-                if room.room_id <> self.in_room:
+                if room.room_id != self.in_room:
                     print "ROOM id: %s, %s" % (room.room_id, room.rect)
                 self.in_room = room.room_id
         for door in self.game.maps.doors:
