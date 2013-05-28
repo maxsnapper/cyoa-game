@@ -47,9 +47,10 @@ class Player(object):
         self.room = self.in_room()
 
     def in_room(self):
+        rtn_room = None
         for room in self.game.maps.rooms:
             room.color = (255, 255, 255)
             if room.rect.contains(self.rect):
                 room.color = (90, 90, 90)
-                rtn_room = room        
+                rtn_room = room
         return rtn_room

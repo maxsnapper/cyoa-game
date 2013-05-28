@@ -70,7 +70,7 @@ class Main():
             for door in self.maps.doors :
                 print "door: %i: %s -- %s" % (door.door_id, list(door.room_ids), list(door.rect))
         elif key == pygame.K_r:
-            print "\n\n\n\n"
+            print "Reloading Map"
             self.player = Player(game=self)
             self.maps = Maps(game=self)
         elif key == pygame.K_h:
