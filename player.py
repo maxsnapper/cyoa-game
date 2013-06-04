@@ -43,6 +43,8 @@ class Player(object):
             self.rect.y += dy
         
         if self.in_room() != self.room and (not on_door or on_door.closed):
+            if on_door.closed:
+                print "You can't go through here the door is closed!\nYou may want to try opening it"
             self.rect.x = old_location['x']
             self.rect.y = old_location['y']
         self.room = self.in_room()
@@ -52,7 +54,7 @@ class Player(object):
         for room in self.game.maps.rooms:
             room.color = (255, 255, 255)
             if room.rect.contains(self.rect):
-                room.color = (90, 90, 90)
+                room.color = (50, 50, 50)
                 rtn_room = room
         return rtn_room
 
