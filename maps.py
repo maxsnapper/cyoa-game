@@ -1,6 +1,14 @@
 import pygame
 from random import randint
 
+colours = {}
+colours['white'] = (255, 255, 255)
+colours['black'] = (0, 0, 0)
+colours['red'] = (255, 0, 0)
+colours['green'] = (0, 255, 0)
+colours['blue'] = (0, 0, 255)
+
+
 class Maps(object):
 
     def __init__(self, game):
@@ -14,7 +22,6 @@ class Maps(object):
         self.min_room_area = 2500
         self.min_room_size = 50
         self.multiplier = 10
-        pygame.display.set_caption('Choose your own Adventure game!')
         self.generate(game)
     
     def generate(self, game):
@@ -114,7 +121,7 @@ class Maps(object):
                     if x :
                         room1.attached.append(room2)
                         room2.attached.append(room1)
-                        new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), (255, 0, 0))
+                        new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), colours['red'])
                         if not (new_door.is_duplicate(self.doors)):
                             self.doors.append(new_door)
                             room1.doors.append(new_door)
@@ -156,7 +163,7 @@ class Maps(object):
                     if y :
                         room1.attached.append(room2)
                         room2.attached.append(room1)
-                        new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), (0, 255, 0))
+                        new_door = Doors(self.game, x, y, (room1, room2), len(self.doors), colours['red'])
                         if not (new_door.is_duplicate(self.doors)):
                             self.doors.append(new_door)
                             room1.doors.append(new_door)
@@ -165,7 +172,7 @@ class Maps(object):
                             new_door = None
 
 class Rooms(object):
-    def __init__(self, game, x, y, width, height, room_id=0, color=(255, 255, 255) ):
+    def __init__(self, game, x, y, width, height, room_id=0, color=colours['white'] ):
         self.game = game
         self.x = x
         self.y = y
@@ -189,7 +196,7 @@ class Rooms(object):
         return self.width * self.height
 
 class Doors(object):
-    def __init__(self, game, x, y, rooms, door_id=0, color=(0, 0, 255)):
+    def __init__(self, game, x, y, rooms, door_id=0, color=colours['blue']):
         self.game = game
         self.x = x - 10
         self.y = y - 10
@@ -202,6 +209,7 @@ class Doors(object):
         self.rooms = rooms
         self.room_ids = []
         self.color = color
+        self.closed = True
         for room in self.rooms:
             self.room_ids.append(room.room_id)
             
@@ -211,4 +219,11 @@ class Doors(object):
             if sorted(self.room_ids) == sorted(door.room_ids):
                 is_duplicate = True
         return is_duplicate
-
+    
+    def action(self):
+        if self.closed:
+            self.closed = False
+            self.color = colours['green']
+        else:
+            self.closed = True
+            self.color = colours['red']

@@ -10,9 +10,11 @@ class QuitGame(Exception):
 class Main():
     def __init__(self):
         pygame.init()
+        self.extras = []
         self.maps = Maps(game=self)
         self.player = Player(game=self)
         self.screen = pygame.display.set_mode((self.maps.width, self.maps.height))
+        pygame.display.set_caption('Choose your own Adventure game!')
         self.play()
 
     def play(self):
@@ -46,6 +48,8 @@ class Main():
         for door in self.maps.doors:
             pygame.draw.rect(self.screen, door.color, door.rect)
         pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
+        for extra in self.extras:
+            pygame.draw.rect(self.screen, (0, 0, 0), extra.rect, 0)
         pygame.display.flip()
 
     def key_action(self, key):
@@ -65,6 +69,8 @@ class Main():
             self.player.move(0, 1)
         elif key == pygame.K_s:
             self.player.move(0, 0.5)
+        elif key == pygame.K_o:
+            self.player.open_door()
         elif key == pygame.K_l:
             print "List Doors"
             for door in self.maps.doors :
@@ -80,7 +86,8 @@ class Main():
         print ""
         print "-" * 20
         print "Show the help screen"
-
+        print "Use the arrow keys to navigate around the character around the map"
+        print ""
 
 if __name__ == "__main__":
     Main()

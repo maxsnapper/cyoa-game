@@ -17,15 +17,16 @@ class Player(object):
         allow_move = False
         is_door = False
         room  = self.in_room()
+        on_door = None
         for door in room.doors:
             if door.rect.contains(self.rect):
-                is_door = True
+                on_door = door
                 break
             else:
                 pass
-        self.move_character(dx, dy, is_door)
+        self.move_character(dx, dy, door)
 
-    def move_character(self, dx, dy, is_door):
+    def move_character(self, dx, dy, on_door):
         old_location = {'x': self.rect.x, 'y': self.rect.y}
         if dx + self.rect.x <= 0: 
             self.rect.x = 0
@@ -41,7 +42,7 @@ class Player(object):
         else:
             self.rect.y += dy
         
-        if self.in_room() != self.room and not is_door:
+        if self.in_room() != self.room and (not on_door or on_door.closed):
             self.rect.x = old_location['x']
             self.rect.y = old_location['y']
         self.room = self.in_room()
@@ -54,3 +55,10 @@ class Player(object):
                 room.color = (90, 90, 90)
                 rtn_room = room
         return rtn_room
+
+    def open_door(self):
+        for door in self.room.doors:
+            if door.rect.contains(self.rect):
+                door.action()
+
+       
