@@ -99,24 +99,24 @@ class Maps(object):
                     if (room1.x <= room2.x and 
                         room1.x2 >= room2.x2): 
                         # bigger than original box
-                        if (room2.x2 - room2.x) >= 50 :
+                        if (room2.x2 - room2.x) >= self.min_room_size :
                             x = (room2.x + room2.x2)/2
                     elif (room1.x >= room2.x and 
                         room1.x2 <= room2.x2): 
                         # smaller than original box
-                        if (room1.x2 - room1.x) >= 50:
+                        if (room1.x2 - room1.x) >= self.min_room_size:
                             x = (room1.x + room1.x2)/2
                     elif (room1.x >= room2.x and 
                         room1.x < room2.x2 and 
                         room1.x2 >= room2.x2):
                         # overlaps and to the left of original room
-                        if room2.x2 - room1.x >= 50:
+                        if room2.x2 - room1.x >= self.min_room_size:
                             x = (room1.x + room2.x2)/2
                     elif (room1.x <= room2.x and 
                         room1.x2 > room2.x and 
                         room1.x2 <= room2.x2): 
                         # overlaps and to the right of the original room
-                        if (room1.x2 - room2.x) >= 50:
+                        if (room1.x2 - room2.x) >= self.min_room_size:
                             x = (room2.x + room1.x2)/2
                     if x :
                         room1.attached.append(room2)
@@ -141,24 +141,24 @@ class Maps(object):
                     if (room1.y <= room2.y and 
                         room1.y2 >= room2.y2): 
                         # bigger than original box
-                        if (room2.y2 - room2.y) >= 50 :
+                        if (room2.y2 - room2.y) >= self.min_room_size :
                             y = (room2.y + room2.y2)/2
                     elif (room1.y >= room2.y and 
                         room1.y2 <= room2.y2): 
                         # smaller than original box
-                        if (room1.y2 - room1.y) >= 50:
+                        if (room1.y2 - room1.y) >= self.min_room_size:
                             y = (room1.y + room1.y2)/2
                     elif (room1.y >= room2.y and 
                         room1.y < room2.y2 and 
                         room1.y2 >= room2.y2):
                         # overlaps and to the left of original room
-                        if room2.y2 - room1.y >= 50:
+                        if room2.y2 - room1.y >= self.min_room_size:
                             y = (room1.y + room2.y2)/2
                     elif (room1.y <= room2.y and 
                         room1.y2 > room2.y and 
                         room1.y2 <= room2.y2): 
                         # overlaps and to the right of the original room
-                        if (room1.y2 - room2.y) >= 50:
+                        if (room1.y2 - room2.y) >= self.min_room_size:
                             y = (room2.y + room1.y2)/2
                     if y :
                         room1.attached.append(room2)

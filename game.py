@@ -12,9 +12,9 @@ class Main():
         pygame.init()
         self.extras = []
         self.maps = Maps(game=self)
-        self.player = Player(game=self)
         self.screen = pygame.display.set_mode((self.maps.width, self.maps.height))
-        pygame.display.set_caption('Choose your own Adventure game!')
+        self.player = Player(game=self)
+        pygame.display.set_caption('Game')
         self.play()
 
     def play(self):
@@ -40,49 +40,44 @@ class Main():
 
     def draw_map(self):
         self.screen.fill((0, 0, 0))
+        update_rects = [self.player.rect]
         for room in self.player.open_rooms:
-#        for room in self.maps.rooms:
-#            if room == self.player.in_room():
-#                pygame.draw.rect(self.screen, room.color, room.rect, 0)
-#            else:
             self.screen.fill((60, 60, 60), room.rect)
             pygame.draw.rect(self.screen, room.color, room.rect, 1)
+            update_rects.append(room.rect)
             for door in room.doors:
                 pygame.draw.rect(self.screen, door.color, door.rect)
+                update_rects.append(room.rect)
         pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
-        for extra in self.extras:
-            pygame.draw.rect(self.screen, (0, 0, 0), extra.rect, 0)
+        pygame.display.update(update_rects)
+#        self.player.imageRect = pygame
+        self.screen.blit(self.player.image, (40, 40))
         pygame.display.flip()
 
     def key_action(self, key):
         if key == pygame.K_LEFT:
             self.player.move(-1, 0)
-        elif key == pygame.K_a:
-            self.player.move(-0.5, 0)
         elif key == pygame.K_RIGHT:
             self.player.move(1, 0)
-        elif key == pygame.K_d:
-            self.player.move(0.5, 0)
         elif key == pygame.K_UP:
             self.player.move(0, -1)
-        elif key == pygame.K_w:
-            self.player.move(0, -0.5)
         elif key == pygame.K_DOWN:
             self.player.move(0, 1)
-        elif key == pygame.K_s:
-            self.player.move(0, 0.5)
-        elif key == pygame.K_o:
+        elif key == pygame.K_o or key == pygame.K_SPACE:
             self.player.open_door()
-        elif key == pygame.K_l:
-            print "List Doors"
-            for room in self.player.open_rooms :
-                print "room: %r" % (room)
         elif key == pygame.K_r:
             print "Reloading Map"
-            self.player = Player(game=self)
+            self.screen.fill((0, 0, 0))
+            pygame.display.flip()
+            self.player = self.maps = None
             self.maps = Maps(game=self)
+            self.player = Player(game=self)
         elif key == pygame.K_h:
             self.help_screen()
+        elif key == pygame.K_l:
+            print "List Open Rooms"
+            for room in self.player.open_rooms :
+                print "room: %r" % (room)
 
     def help_screen(self):
         print ""

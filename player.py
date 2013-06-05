@@ -1,51 +1,41 @@
+""" Player object """
 import pygame
 
 class Player(object):
-
+    """ Player object """
     def __init__(self, game):
+        """ initialize the players character """
         self.game = game
         self.rect = pygame.Rect(30, 30, 10, 10)
         self.open_rooms = []
         self.room = self.in_room()
+        self.open_rooms = [self.room]
+        self.image = pygame.image.load('character.png')
+        #self.game.screen.blit(self.image, (40, 40))
 
-    def move(self, dx, dy):
-        if dx != 0:
-            self.move_single_axis(dx*10, 0)
-        if dy != 0:
-            self.move_single_axis(0, dy*10)
- 
-    def move_single_axis(self, dx, dy):
-        allow_move = False
-        is_door = False
-        room  = self.in_room()
-        on_door = None
-        for door in room.doors:
+    def move(self, move_x, move_y, on_door=None):
+        """ move the character around the map, 
+        checking not going out of bounds 
+        or walking through closed doors or walls """
+        # increase the step size to compensate for block sizes
+        move_x = move_x*10 
+        move_y = move_y*10
+        old_location = {'x': self.rect.x, 'y': self.rect.y}
+        if not (move_x + self.rect.x < 0 or \
+            move_x + self.rect.x >= self.game.maps.width):
+            self.rect.x += move_x
+        if not (move_y + self.rect.y < 0 or \
+            move_y + self.rect.y >= self.game.maps.height):
+            self.rect.y += move_y
+        for door in self.in_room().doors:
             if door.rect.contains(self.rect):
                 on_door = door
                 break
-            else:
-                pass
-        self.move_character(dx, dy, door)
-
-    def move_character(self, dx, dy, on_door):
-        old_location = {'x': self.rect.x, 'y': self.rect.y}
-        if dx + self.rect.x <= 0: 
-            self.rect.x = 0
-        elif dx + self.rect.x >= self.game.maps.width:
-            self.rect.x = self.game.maps.width-10
-        else: 
-            self.rect.x += dx
-
-        if dy + self.rect.y <= 0: 
-            self.rect.y = 0
-        elif dy + self.rect.y >= self.game.maps.height:
-            self.rect.y = self.game.maps.height-10
-        else:
-            self.rect.y += dy
-        
-        if self.in_room() != self.room and (not on_door or on_door.closed):
-            if on_door.closed:
-                print "You can't go through here the door is closed!\nYou may want to try opening it"
+        if self.in_room() != self.room and \
+            (not on_door or on_door.closed):
+            if on_door and on_door.closed:
+                print "You can't go through here the door is closed!"
+                print "You may want to try opening it"
             self.rect.x = old_location['x']
             self.rect.y = old_location['y']
         self.room = self.in_room()
@@ -53,16 +43,20 @@ class Player(object):
             self.open_rooms.append(self.room)
 
     def in_room(self):
+        """ Check if the player is in a room
+
+        return the room object that they are in """
         rtn_room = None
         for room in self.game.maps.rooms:
             room.color = (255, 255, 255)
             if room.rect.contains(self.rect):
-                #room.color = (50, 50, 50)
                 rtn_room = room
         return rtn_room
 
     def open_door(self):
+        """ Check if the player is close enough to a door
+        Open the door to the next room """
         for door in self.room.doors:
             if door.rect.contains(self.rect):
-                room = door.action()
+                door.action()
        
