@@ -40,13 +40,15 @@ class Main():
 
     def draw_map(self):
         self.screen.fill((0, 0, 0))
-        for room in self.maps.rooms:
-            if room == self.player.in_room():
-                pygame.draw.rect(self.screen, room.color, room.rect, 0)
-            else:
-                pygame.draw.rect(self.screen, room.color, room.rect, 1)
-        for door in self.maps.doors:
-            pygame.draw.rect(self.screen, door.color, door.rect)
+        for room in self.player.open_rooms:
+#        for room in self.maps.rooms:
+#            if room == self.player.in_room():
+#                pygame.draw.rect(self.screen, room.color, room.rect, 0)
+#            else:
+            self.screen.fill((60, 60, 60), room.rect)
+            pygame.draw.rect(self.screen, room.color, room.rect, 1)
+            for door in room.doors:
+                pygame.draw.rect(self.screen, door.color, door.rect)
         pygame.draw.rect(self.screen, (255, 200, 0), self.player.rect)
         for extra in self.extras:
             pygame.draw.rect(self.screen, (0, 0, 0), extra.rect, 0)
@@ -73,8 +75,8 @@ class Main():
             self.player.open_door()
         elif key == pygame.K_l:
             print "List Doors"
-            for door in self.maps.doors :
-                print "door: %i: %s -- %s" % (door.door_id, list(door.room_ids), list(door.rect))
+            for room in self.player.open_rooms :
+                print "room: %r" % (room)
         elif key == pygame.K_r:
             print "Reloading Map"
             self.player = Player(game=self)

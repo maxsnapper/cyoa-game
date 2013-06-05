@@ -5,6 +5,7 @@ class Player(object):
     def __init__(self, game):
         self.game = game
         self.rect = pygame.Rect(30, 30, 10, 10)
+        self.open_rooms = []
         self.room = self.in_room()
 
     def move(self, dx, dy):
@@ -48,19 +49,20 @@ class Player(object):
             self.rect.x = old_location['x']
             self.rect.y = old_location['y']
         self.room = self.in_room()
+        if (self.room not in self.open_rooms):
+            self.open_rooms.append(self.room)
 
     def in_room(self):
         rtn_room = None
         for room in self.game.maps.rooms:
             room.color = (255, 255, 255)
             if room.rect.contains(self.rect):
-                room.color = (50, 50, 50)
+                #room.color = (50, 50, 50)
                 rtn_room = room
         return rtn_room
 
     def open_door(self):
         for door in self.room.doors:
             if door.rect.contains(self.rect):
-                door.action()
-
+                room = door.action()
        
